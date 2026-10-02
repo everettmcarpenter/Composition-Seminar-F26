@@ -39,13 +39,13 @@ GG.scene().backgroundColor( Color.WHITE );
 // GWindow.mouseMode( GWindow.MOUSE_DISABLED );
 GWindow.fullscreen();
 
-LFO alphaMod( 0.05 );
-LFO betaMod( 0.025 );
+LFO alphaMod( 0.002601 );
+LFO betaMod( 0.00261 );
 
 // coeff
 1.4 => float a;
 0.31 => float b;
-100000 => int NUM_POINTS;
+50000 => int NUM_POINTS;
 6.0 => float BOUNDARY;
 
 // stretch
@@ -71,8 +71,8 @@ spork ~
 while( true )
 {
     GG.nextFrame() => now;
-    1.5 * alphaMod.tick() * a => float modA;
-    1.5 * betaMod.tick() * b => float modB;
+    2.5 * alphaMod.tick() * a => float modA;
+    2.5 * betaMod.tick() * b => float modB;
     points.positions( henon( modA, modB ) );
 }
 
