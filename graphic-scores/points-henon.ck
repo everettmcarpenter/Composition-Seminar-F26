@@ -1,3 +1,13 @@
+/*
+
+	TODO: Investigate sampling the map at a rate slower than GG.nextFrame() => now
+		  this way we save computation time and then we simply interpolate to the 
+		  sampled points. This could potentially allow us to have more points.
+
+*/
+
+
+
 public class LFO
 {
     1.0 => float freq; // normalized
@@ -46,7 +56,8 @@ LFO betaMod( 0.00261 );
 1.4 => float a;
 0.31 => float b;
 50000 => int NUM_POINTS;
-6.0 => float BOUNDARY;
+GG.windowWidth() => float XBOUNDARY;
+GG.windowHeight() => float YBOUNDARY;
 
 // stretch
 1.0 => float xStretch;
@@ -84,9 +95,9 @@ fun vec3[] henon( float alpha, float beta )
         // x 
         ( positions[i].y  + 1.0 - alpha * ( positions[i].x * positions[i].x ) ) * xStretch => float x;
         ( beta * positions[i].x ) * yStretch => float y;
-        if( x >= BOUNDARY || x <= -BOUNDARY )
+        if( x >= XBOUNDARY || x <= -XBOUNDARY )
             Math.cos( x ) => x;
-        if( y >= BOUNDARY || y <= -BOUNDARY )
+        if( y >= YBOUNDARY || y <= -YBOUNDARY )
             Math.sin( y ) => y;
         
         // point
