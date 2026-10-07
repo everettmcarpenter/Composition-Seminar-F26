@@ -6,8 +6,6 @@
 
 */
 
-
-
 public class LFO
 {
     1.0 => float freq; // normalized
@@ -51,15 +49,13 @@ GWindow.fullscreen();
 
 LFO alphaMod( 0.002601 );
 LFO betaMod( 0.00261 );
-LFO alpha( 0.00245 );
-LFO beta( 0.00876 );
 
 // coeff
 1.4 => float a;
 0.31 => float b;
-100 => int NUM_POINTS;
-4.0 => float XBOUNDARY;
-4.0 => float YBOUNDARY;
+50000 => int NUM_POINTS;
+GG.windowWidth() => float XBOUNDARY;
+GG.windowHeight() => float YBOUNDARY;
 
 // stretch
 1.0 => float xStretch;
@@ -67,7 +63,7 @@ LFO beta( 0.00876 );
 // colors of points
 [Color.BLACK] @=> vec3 colors[];
 // size of points
-[ 0.5 ] @=> float sizes[];
+[1.0] @=> float sizes[];
 
 // put them somewhere 
 points.positions( henon( a, b ) );
@@ -84,15 +80,17 @@ spork ~
 while( true )
 {
     GG.nextFrame() => now;
-    1.0 * alphaMod.tick() * ( alpha.tick() + 2.0 * 1.0 ) => float modA;
-    1.0 * betaMod.tick() * ( beta.tick() + 1.7 * 1.5  ) => float modB;
+    
+
+    2.5 * alphaMod.tick() * a => float modA;
+    2.5 * betaMod.tick() * b => float modB;
     points.positions( henon( modA, modB ) );
 }
 
 fun vec3[] henon( float alpha, float beta )
 {
     vec3 positions[1];
-    for( int i; i < NUM_POINTS; i++ )
+    for( int i; i <= NUM_POINTS; i++ )
     {
         // x 
         ( positions[i].y  + 1.0 - alpha * ( positions[i].x * positions[i].x ) ) * xStretch => float x;

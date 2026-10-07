@@ -6,8 +6,6 @@
 
 */
 
-
-
 public class LFO
 {
     1.0 => float freq; // normalized
@@ -49,28 +47,44 @@ GG.scene().backgroundColor( Color.WHITE );
 // GWindow.mouseMode( GWindow.MOUSE_DISABLED );
 GWindow.fullscreen();
 
-LFO alphaMod( 0.002601 );
+LFO alphaMod( 0.2601 );
 LFO betaMod( 0.00261 );
-LFO alpha( 0.00245 );
-LFO beta( 0.00876 );
+LFO alpha( 0.054 );
+LFO beta( 0.176 );
 
 // coeff
 1.4 => float a;
 0.31 => float b;
-100 => int NUM_POINTS;
+5000 => int NUM_POINTS;
 4.0 => float XBOUNDARY;
 4.0 => float YBOUNDARY;
+
+// sine
+Step st[8] => Gain scale( 0.5 )[2] => ResonZ filter[16] => Distort dirt[filter.size()] => Gain volume( 1.0 / ( filter.size() * 0.5 ) )[2] => dac;
+dirt => DelayL delay( 80::ms )[filter.size()] => Gain feed( 0.36 )[filter.size()] => filter;
+volume => LPF lo( 100.0, 1.0 )[2] => Gain loGain( 0.5 )[2] => dac;
+
+for( int i; i < filter.size(); i++ )
+{
+	filter[i].set( ( i + 1 ) * ( 1000.0 / filter.size() ), 4.0 );
+	dirt[i].mode( 3 );
+	delay[i].delay( ( Math.random2f( 0.5, 10.0 ) + ( i + 1 ) ) * 5::ms );
+}
 
 // stretch
 1.0 => float xStretch;
 1.0 => float yStretch;
 // colors of points
-[Color.BLACK] @=> vec3 colors[];
+[ Color.BLACK ] @=> vec3 colors[];
 // size of points
 [ 0.5 ] @=> float sizes[];
+//
+vec3 pos[];
+
+henon( a, b ) @=> pos;
 
 // put them somewhere 
-points.positions( henon( a, b ) );
+points.positions( pos );
 // color
 points.colors( colors );
 // size
@@ -81,12 +95,16 @@ points.billboard( 1 );
 spork ~
    mouseShred();
 
+spork ~ 
+    stepper();
+
 while( true )
 {
     GG.nextFrame() => now;
-    1.0 * alphaMod.tick() * ( alpha.tick() + 2.0 * 1.0 ) => float modA;
-    1.0 * betaMod.tick() * ( beta.tick() + 1.7 * 1.5  ) => float modB;
-    points.positions( henon( modA, modB ) );
+    0.5 * alphaMod.tick() * ( alpha.tick() + 2.0 * 0.30 ) => float modA;
+    0.7 * betaMod.tick() * ( beta.tick() + 1.7 * 0.25  ) => float modB;
+    henon( modA, modB ) @=> pos;
+    points.positions( pos );
 }
 
 fun vec3[] henon( float alpha, float beta )
@@ -103,7 +121,7 @@ fun vec3[] henon( float alpha, float beta )
             Math.sin( y ) => y;
         
         // point
-        positions << @( x , y , 0 );
+        positions << @( x , y , Math.cos( y * x ) );
     }
     return positions;
 }
@@ -127,4 +145,21 @@ fun void mouseShred()
 		}
 		1024::samp => now; 
 	}
+}
+
+fun void stepper()
+{
+    int i;
+    while( true )
+    {
+    	pos[i].magnitude() => float mag;
+        // wrap
+        if( mag > 1.0 || mag < -1.0 )
+            Math.sin( mag ) => mag;
+        // set 
+        st[i % 2].next( mag );
+        // increment wrap around
+        ++i % pos.size() => i;
+        1::samp => now;
+    }
 }
