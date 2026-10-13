@@ -45,17 +45,17 @@ LFO betaMod( 0.00261 );
 // coeff
 1.4 => float a;
 0.31 => float b;
-50000 => int NUM_POINTS;
-GG.windowWidth() => float XBOUNDARY;
-GG.windowHeight() => float YBOUNDARY;
+15000 => int NUM_POINTS;
+8.0 => float XBOUNDARY;
+8.0 => float YBOUNDARY;
 
 // stretch
 1.0 => float xStretch;
 1.0 => float yStretch;
 // colors of points
-[Color.BLACK] @=> vec3 colors[];
+[ Color.BLACK ] @=> vec3 colors[];
 // size of points
-1.0 => float sizes;
+0.025 => float sizes;
 
 // put them somewhere 
 points.positions( henon( a, b ) );

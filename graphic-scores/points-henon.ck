@@ -6,8 +6,6 @@
 
 */
 
-
-
 public class LFO
 {
     1.0 => float freq; // normalized
@@ -57,7 +55,7 @@ LFO beta( 0.00876 );
 // coeff
 1.4 => float a;
 0.31 => float b;
-100 => int NUM_POINTS;
+15000 => int NUM_POINTS;
 4.0 => float XBOUNDARY;
 4.0 => float YBOUNDARY;
 
@@ -103,7 +101,7 @@ fun vec3[] henon( float alpha, float beta )
             Math.sin( y ) => y;
         
         // point
-        positions << @( x , y , 0 );
+        positions << @( x , y , Math.cos( x ) * Math.sin( y ) );
     }
     return positions;
 }

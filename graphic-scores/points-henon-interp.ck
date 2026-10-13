@@ -12,6 +12,7 @@ public class LFO
     float increment; // step size
     float phase; // current val
     60.0 => float fs;
+    float lastSamp;
  
     fun @construct( float nFreq )
     {
@@ -28,13 +29,20 @@ public class LFO
         else if( phase <= -2.0 * Math.pi )
             phase + ( 2.0 * Math.pi ) => phase;
 
-        return Math.sin( phase );
+        Math.sin( phase ) => lastSamp;
+        return lastSamp;
+    }
+
+    fun float last()
+    {
+        return lastSamp;
     }
 }
 
 // mouse
 Hid mouse;
 HidMsg mmsg;
+Event theNotification;
 
 // spawn points
 GPoints points --> GG.scene();
@@ -49,13 +57,15 @@ GWindow.fullscreen();
 
 LFO alphaMod( 0.002601 );
 LFO betaMod( 0.00261 );
+LFO alpha( 0.00245 );
+LFO beta( 0.00876 );
 
 // coeff
 1.4 => float a;
 0.31 => float b;
-50000 => int NUM_POINTS;
-GG.windowWidth() => float XBOUNDARY;
-GG.windowHeight() => float YBOUNDARY;
+150 => int NUM_POINTS;
+4.0 => float XBOUNDARY;
+4.0 => float YBOUNDARY;
 
 // stretch
 1.0 => float xStretch;
@@ -63,10 +73,15 @@ GG.windowHeight() => float YBOUNDARY;
 // colors of points
 [Color.BLACK] @=> vec3 colors[];
 // size of points
-[1.0] @=> float sizes[];
+[ 0.5 ] @=> float sizes[];
+// targets
+vec3 targets[ NUM_POINTS ];
+// current
+vec3 current[];
 
 // put them somewhere 
-points.positions( henon( a, b ) );
+henon( a, b ) @=> current;
+points.positions( current );
 // color
 points.colors( colors );
 // size
@@ -75,22 +90,57 @@ points.sizes( sizes );
 points.billboard( 1 );
 
 spork ~
-   mouseShred();
+    mouseShred();
+
+spork ~
+    sampler( theNotification, targets );
 
 while( true )
 {
     GG.nextFrame() => now;
-    
+    // tick
+    alphaMod.tick();
+    betaMod.tick();
+    alpha.tick();
+    beta.tick();
 
-    2.5 * alphaMod.tick() * a => float modA;
-    2.5 * betaMod.tick() * b => float modB;
-    points.positions( henon( modA, modB ) );
+    lerp( current, targets, 0.25 ) @=> current;
+    points.positions( current );
+}
+
+fun vec3 lerp( vec3 lhs, vec3 rhs, float d )
+{
+    return lhs + d * ( rhs - lhs );
+}
+
+fun vec3[] lerp( vec3 lhs[], vec3 rhs[], float d )
+{
+    // we output this
+    vec3 out[0];
+    // vectorize vectors
+    for( int i; i < lhs.size(); i++ )
+    {
+        out << lerp( lhs[i], rhs[i], d ); // overloaded recursion? i should learn computer science
+        <<< out[i] >>>;
+    }
+    return out;
+}
+
+fun void sampler( Event @ notif, vec3 buffer[] )
+{
+    while( true )
+    {
+        1000::ms => now;
+        1.0 * alphaMod.last() * ( alpha.last() + 2.0 * 1.0 ) => float modA;
+        1.0 * betaMod.last() * ( beta.last() + 1.7 * 1.5  ) => float modB;
+        henon( modA, modB ) @=> buffer;
+    }
 }
 
 fun vec3[] henon( float alpha, float beta )
 {
     vec3 positions[1];
-    for( int i; i <= NUM_POINTS; i++ )
+    for( int i; i < NUM_POINTS; i++ )
     {
         // x 
         ( positions[i].y  + 1.0 - alpha * ( positions[i].x * positions[i].x ) ) * xStretch => float x;
@@ -99,10 +149,14 @@ fun vec3[] henon( float alpha, float beta )
             Math.cos( x ) => x;
         if( y >= YBOUNDARY || y <= -YBOUNDARY )
             Math.sin( y ) => y;
-        
+
         // point
-        positions << @( x , y , 0 );
+        positions << @( x , y , Math.cos( x ) * Math.sin( y ) );
     }
+
+    // pop front since we needed a reference point
+    positions.popFront();
+
     return positions;
 }
 
