@@ -1,0 +1,30 @@
+For Ibrahem is a piece about a Palestinian man I once knew. In the years 2024 and 2025, I was attempting to support him and his family by interacting with him on the social media platform TikTok as a way of bringing his account to the forefront of the website's algorithm. We communicated a few times through direct messaging, but I largely learned about his everyday life through videos he would post documenting the conditions of those living in Palestine. Ibrahem himself was a resident of Palestine at the time I knew him, and I am unaware of his whereabouts now. Near the end of January of 2025, I stopped receiving messages from Ibrahem. I have since attempted to reach out to him, hoping to find a way that I could support him or at least maintain contact. I have not heard from Ibrahem since July 24th, 2025. The Palestinian Information Center (PIC) marks that day as the 657th day of the Israeli occupation on Gaza. PIC reported that at least 20 palestinians were killed by air strikes that day. I may never know if Ibrahem is still alive with his father, Adham; his mother, Amani; his sisters, Miral and Dima; or his wife and two daughters. 
+
+At the time I am writing this on November 13th, 2026, it has since been 1,133 days since October 7th of 2023. Thousands of cases such as Ibrahem's have been witnessed by countless people around the world as strikes upon Gaza continue. For Ibrahem attempts to convey the dissonance and uncertainty I experienced in witnessing Ibrahem's struggles as well as the Palestinian genocide as a whole.
+
+
+
+
+Notes for Performers:
+	It is intensely that I must express how important communication between the laptopist and pianist is within this piece. If possible, performers should take time before the piece to outline a few gestures which they will use to communicate emotions such as "stress", "relief", "evil" and "shame". I relinquish these emotional gestures to the performers to ensure that their voices may find place within this piece. These emotions should be mapped onto the respective scores of the performers, such that segments of the score are understood to describe the emotions evoked within them by the material. Performers will thus navigate the score in a "stream of consciousness" fashion, where their figurative and gestural dialogue will be the driving external factor which steers their journey. While I request that performers navigate this collage with such autonomy, I must additionally request a few "givens" which I hope the performers will provide.
+	 
+	// insert chord phrasing here
+
+The above passage is a fundamental material of the piano collage. It is with a phlegmatic temperament that I request the performance begin or end with this phrase. If the performers do wish to listen to this request, they should establish whether it will be the beginning or end before the performance.    
+
+The performers should progress through the collage starting at any point along the edges of it. One does not need to begin at the "musical" start of a segment such as the statement of the clefs, the performer may begin at the intersection of two staves if they so wish. 
+
+Notes for Pianist:
+	The pianist is presented with a collage musical materials. It includes passages for one or two hands, although sections physically requiring two hands may be modified so that only a selection of it may be played with one (i.e. the left hand part mustn't be strictly performed alongside the right.). This "collage" is truly not a full collage, more so a visual grouping of phrases which may be connected in any way. There are dotted arrows to provide suggested paths documented by the composer (myself), but no one needs to listen to what I say. As mentioned previously, the pianist may "split" where they are playing more than one phrase at a time. There are no strict guidelines to the nature of this splitting, but I suggest that the performer curate lines or motives from various sections and performs them simultaneously.
+	Pianist, please note that the computer element of this piece does enact extensions of your performance. For example, the one bar phrase referred to as "theta" has special note heads on a few pitches that are marked, only play the "regular" noteheads, the computer will recognize them and play these extensions for you, and potentially embellish upon them. I currently refrain from noting any further computer interactions you may or may not have due to the fact that I have not yet written them at this time.  
+
+Notes for Laptopist:
+	As many laptop performers are familiar with, a score for electronics can oftentimes be hyper specific, or hyper vague. Oftentimes, the score needs many explanations for it's use of symbols and other runes, this score is no exception. I will lay out the various symbolic meanings of each section within the collage under the assumption that the performer has never spoken to me.
+
+	// raindrops ( takes actively depressed keys and plays motives that fall from the top of the keyboard to the bottom )
+	// example: suppose the pianist is playing a four note chord, the a row is determined randomly such that the pitches of the chord are played in a sequence and then transposed down octaves while the pianist holds the chord ( this effect works for any number of depressed keys )
+
+	// phrase smash 
+	// this one is fun. the laptopist may enact a few modes which interpret the piano player's input as the root of an extension which is built upon a fundamental interval.
+	// example: the pianist is playing a monophonic sequence :"E, G, B":, what a lovely e minor arpeggio. the laptopist may enact a process which take in each pitch, and stacks N number of extensions of it at X interval, say, 7 major thirds. when the pianist depresses the "E" key, the computer will respond with "G, B, D#, F##, A##, C###, E (something)". this creates some fun parallel harmony stuff. maybe the laptopist can delay each successive extension too, i dont know. 
+
