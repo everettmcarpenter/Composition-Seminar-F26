@@ -28,3 +28,14 @@ Notes for Laptopist:
 	// this one is fun. the laptopist may enact a few modes which interpret the piano player's input as the root of an extension which is built upon a fundamental interval.
 	// example: the pianist is playing a monophonic sequence :"E, G, B":, what a lovely e minor arpeggio. the laptopist may enact a process which take in each pitch, and stacks N number of extensions of it at X interval, say, 7 major thirds. when the pianist depresses the "E" key, the computer will respond with "G, B, D#, F##, A##, C###, E (something)". this creates some fun parallel harmony stuff. maybe the laptopist can delay each successive extension too, i dont know. 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+	Each character is a space where probabilities of events are increased or decreased. 
+	Say the player enter Theta, they begin at a starting point, and after a certain number of key
+	presses, they initiate a transition. The probability that they transition to a certain state is 
+	perhaps decided by the number of keypresses on a set of notes. Once they transition, they operate
+	in the same manner as the initial, there is a likelihood they stay in the present state or move to 
+	a new event state. Each state is pre-defined, and they probability of them being transistioned to
+	will varying through performance.
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
