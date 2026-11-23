@@ -16,7 +16,18 @@
 
 public class Alpha extends Scene
 {
-    ;
+    fun void Alpha( GlobalStates handler )
+    {
+        handler @=> states; // now we have universal knowledge of note states
+    }
+}
+
+public class Beta extends Scene
+{
+    fun void Beta( GlobalStates handler )
+    {
+        handler @=> states; // now we have universal knowledge of note states
+    }
 }
 
 public class Gamma extends Scene
@@ -53,11 +64,11 @@ public class Gamma extends Scene
         updateState( msg );
 
         // handle input
-        if( msg.data1 == MIDICODES.CC )
+        if( msg.data1 == MidiCodes.CC )
         {
             ;
         }
-        else if( msg.data1 == MIDICODES.NOTEON )
+        else if( msg.data1 == MidiCodes.NOTEON )
         {
             if( msg.data3 )
             {
@@ -71,7 +82,7 @@ public class Gamma extends Scene
                 }
             }
         }
-        else if( msg.data1 == MIDICODES.NOTEOFF )
+        else if( msg.data1 == MidiCodes.NOTEOFF )
         {
             ;
         }
@@ -80,12 +91,18 @@ public class Gamma extends Scene
 
 public class Phi extends Scene
 {
-    ;
+    fun void Phi( GlobalStates handler )
+    {
+        handler @=> states; // now we have universal knowledge of note states
+    }
 }
 
 public class Lambda extends Scene
 {
-    ;
+    fun void Lambda( GlobalStates handler )
+    {
+        handler @=> states; // now we have universal knowledge of note states
+    }
 }
 
 // scene theta !
@@ -122,11 +139,11 @@ public class Theta extends Scene
         updateState( msg );
 
         // handle input
-        if( msg.data1 == MIDICODES.CC )
+        if( msg.data1 == MidiCodes.CC )
         {
             ;
         }
-        else if( msg.data1 == MIDICODES.NOTEON )
+        else if( msg.data1 == MidiCodes.NOTEON )
         {
             if( msg.data3 )
             {
@@ -150,7 +167,7 @@ public class Theta extends Scene
             }
             <<< "A4", states.noteStates[a4], "Db5", states.noteStates[db5], "G4", states.noteStates[g4], "E5", states.noteStates[e5] >>>;
         }
-        else if( msg.data1 == MIDICODES.NOTEOFF )
+        else if( msg.data1 == MidiCodes.NOTEOFF )
         {
             ;
         }

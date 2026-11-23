@@ -60,8 +60,12 @@ Hid keyboard;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // global state class
 GlobalStates states;
-Theta theta( states );
+Alpha alpha( states );
+Beta beta( states );
 Gamma gamma( states );
+Lambda lambda( states );
+Phi phi( states );
+Theta theta( states );
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
@@ -95,14 +99,14 @@ if( usingDisk )
 // exit ticket
 Event exit;
 
-1 => int ALPHA;
-2 => int BETA;
-3 => int GAMMA;
-4 => int LAMBDA;
-5 => int PHI;
-6 => int THETA;
+1 => int ALPHA; int ALPHA_MSG; // the midi note or cc value corresponding with alpha
+2 => int BETA; int BETA_MSG;
+3 => int GAMMA; int GAMMA_MSG;
+4 => int LAMBDA; int LAMBDA_MSG;
+5 => int PHI; int PHI_MSG;
+6 => int THETA; int THETA_MSG;
 // current scene
-THETA => int scene; 
+THETA => int activeScene; 
 /* scene enum
     {
         ALPHA = 1,
@@ -140,19 +144,17 @@ if( disklavierIn.good() && disklavierOut.good() )
 // forever from here on out
 exit => now;
 
-MIDICODES.flush( disklavierOut );
+MidiTools.flush( disklavierOut );
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-//                  function & shred definitions (they're the same)
+//                  function & shred definitions
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // transition scene
-fun void transitionScene( Scene @ lhs, Scene @ rhs )
+fun void transitionScene( int sceneTo ) // should be called using the enums
 {
-    for( int i; i < 128; i++ )
-    {
-        ;
-    }
+    if( sceneTo >= ALPHA && sceneTo <= THETA )
+        sceneTo => activeScene;
 }
 
 // decrypt keyboard and edit global variables
@@ -201,15 +203,24 @@ fun void controllerShred( MidiIn @ c )
         while( c.recv( msg ) )
         {
             // cc
-            if( msg.data1 == MIDICODES.CC )
+            if( msg.data1 == MidiCodes.CC )
             {
                 ;
             }
-            else if( msg.data1 == MIDICODES.NOTEON )
+            else if( msg.data1 == MidiCodes.NOTEON )
             {
-                ;
+                if( msg.data2 == ALPHA_MSG )
+                    transitionScene( ALPHA );
+                else if( msg.data2 == BETA_MSG )
+                    transitionScene( BETA );
+                else if( msg.data2 == GAMMA_MSG )
+                    transitionScene( GAMMA );
+                else if( msg.data2 == PHI_MSG )
+                    transitionScene( PHI );
+                else if( msg.data2 == THETA_MSG )
+                    transitionScene( THETA );
             }
-            else if( msg.data1 == MIDICODES.NOTEOFF )
+            else if( msg.data1 == MidiCodes.NOTEOFF )
             {
                 ;
             }
@@ -232,11 +243,11 @@ fun void disklavierShred( MidiIn @ in, MidiOut @ out )
         while( in.recv( msg ) )
         {
             // scene
-            if( scene == THETA )
+            if( activeScene == THETA )
             {
                 theta.handleInput( msg, out ); // boom
             }
-            else if( scene == GAMMA )
+            else if( activeScene == GAMMA )
             {
                 gamma.handleInput( msg, out );
             }
@@ -245,7 +256,7 @@ fun void disklavierShred( MidiIn @ in, MidiOut @ out )
 }
 
 /*
-    if( scene == 1 )
+    if( activeScene == 1 )
     {
         if( msg.data2 == 62 ) // D3
             spork ~ outStack( [ 73, 77, 82 ], [ 49, 31, 22 ], 150::ms, released[msg.data2], disklavierOut ); // c4, f4, Bb4
@@ -256,7 +267,7 @@ fun void disklavierShred( MidiIn @ in, MidiOut @ out )
         else if( msg.data2 == 83 ) // B4
             spork ~ outStack( [ 83 - 12, 83 - 24, 82 - 36 ], [ 45, 52, 39 ], 50::ms, released[msg.data2], disklavierOut );
     }
-    else if( scene == 2 )
+    else if( activeScene == 2 )
     {
         if( msg.data2 == 67 )
         {

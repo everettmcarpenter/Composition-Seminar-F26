@@ -1,27 +1,112 @@
-public class MIDICODES
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              global settings & defs
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+public class MidiCodes
 {
     // these are like preprocessor defs
     0xB0 => static int CC;
     0x80 => static int NOTEOFF;
     0x90 => static int NOTEON;
 
+    1 => static int disklavier; // if using disklavier, effects the definition of certain functions
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              global helper
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+public class MidiTools
+{
+    fun static int midiRangeCheck( int in )
+    {
+        if( in <= 0 )
+            return 0;
+        else if( in > 127 )
+            return 0;
+        else
+            return in;
+    }
+
+    // all this is going to handle is the formatting of the message, 
+    // you must handle the timing, the note off, and everything else
+    fun static void noteOn( int note, int velocity, MidiOut @ out )
+    {
+        NoteOn note( note, velocity );
+        out.send( note ); // boom
+    }
+
+    fun static void noteOff( int note, MidiOut @ out )
+    {
+        NoteOff note( note );
+        out.send( note );
+    }
+
     fun static void flush( MidiOut @ out )
     {
         for( int i; i < 128; i++ )
-        {
-            // most machines want note off
-            MidiMsg mess;
-            MIDICODES.NOTEOFF => mess.data1;
-            i => mess.data2;
-            0 => mess.data3;
-            out.send( mess );
-            // some machines want note on with zero velocity
-            MIDICODES.NOTEON => mess.data1;
-            out.send( mess );
-        }
+            MidiTools.noteOff( i, out );
     }
 }
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              note on super class
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+public class NoteOn extends MidiMsg
+{
+    fun void NoteOn( int note, int velocity )
+    {
+        // declare type
+        MidiCodes.NOTEON => this.data1;
+        // declare note
+        if( MidiTools.midiRangeCheck( note ) )
+            note => this.data2;
+        else
+            <<< "NoteOn: error occured, note outside of [0,127] range passed." >>>;
+        // delcare velocity 
+        if( MidiTools.midiRangeCheck( velocity ) )
+            velocity => this.data3;
+        else
+            <<< "NoteOn: error occured, velocity outside of [0,127] range passed." >>>;
+    }
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              note off super class
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+public class NoteOff extends MidiMsg
+{
+    fun void NoteOff( int note )
+    {
+        // declare type
+        if( MidiCodes.disklavier )
+            MidiCodes.NOTEON => this.data1;
+        else
+            MidiCodes.NOTEOFF => this.data1;
+
+        // declare note
+        if( MidiTools.midiRangeCheck( note ) )
+            note => this.data2;
+        else
+            <<< "NoteOff: error occured, note outside of [0,127] range passed." >>>;
+        // velocity will always be 0
+        0 => this.data3;
+    }
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              global states ( allocated by main thread, shared across all )
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 public class GlobalStates
 {
     // midi note states
@@ -30,8 +115,28 @@ public class GlobalStates
     // midi events
     Event pressed[128];
     Event released[128];
-}
 
+    fun void update( int note )
+    {
+        if( noteStates[note] )
+        {
+            0 => noteStates[note];
+            released[note].broadcast();
+        }
+        else
+        {
+            1 => noteStates[note];
+            pressed[note].broadcast();
+        }
+    }
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              extensions
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // a scene will have a class such as this which will provide data regarding how it handles extensions
 public class SceneExtensions
 {
@@ -62,7 +167,13 @@ public class SceneExtensions
     static int extensions[128][0]; 
     static int roots[0];
 }
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//              base scene
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // base class
 public class Scene
 {
@@ -79,27 +190,8 @@ public class Scene
 
     fun void updateState( MidiMsg @ msg )
     {
-        if( msg.data1 == MIDICODES.NOTEON )
-        {
-            if( msg.data3 )
-            {
-                1 => states.noteStates[msg.data2];
-                states.pressed[msg.data2].broadcast();
-                // <<< msg.data2, "on" >>>;
-            }
-            else 
-            {
-                0 => states.noteStates[msg.data2];
-                states.released[msg.data2].broadcast();
-                // <<< msg.data2, "off" >>>;
-            }
-        }
-        else if( msg.data1 == MIDICODES.NOTEOFF )
-        {
-            0 => states.noteStates[msg.data2];
-            states.released[msg.data2].broadcast();
-            // <<< msg.data2, "off" >>>;
-        }
+        if( msg.data1 == MidiCodes.NOTEON || msg.data1 == MidiCodes.NOTEOFF )
+            states.update( msg.data2 );
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -128,13 +220,8 @@ public class Scene
         // playback 
         for( int i; i < notes.size(); i++ )
         {
+            MidiTools.noteOn( notes[i], 64, out ); // send it
             offset + humanTiming( offset ) => now; // wait
-            MidiMsg mess;
-            MIDICODES.NOTEON => mess.data1; // note on
-            notes[i] => mess.data2; // which note
-            <<< notes[i] >>>;
-            64 => mess.data3; // velocity
-            out.send( mess ); // send out
         }
     }
 
@@ -144,13 +231,8 @@ public class Scene
         // playback 
         for( int i; i < notes.size(); i++ )
         {
+            MidiTools.noteOn( notes[i], velocities[i % velocities.size()], out ); // sent
             offset + humanTiming( offset ) => now; // wait
-            MidiMsg mess;
-            MIDICODES.NOTEON => mess.data1; // note on
-            notes[i] => mess.data2; // which note
-            velocities[i % velocities.size()] => mess.data3; // velocity
-            // <<< mess.data1, mess.data2, mess.data3 >>>;
-            out.send( mess ); // send out
         }
     }
 
@@ -165,16 +247,13 @@ public class Scene
             dur timing;
             for( int i; i < notes.size(); i++ )
             {
-                lengths[i % lengths.size()] => timing;
-                timing + humanTiming( timing ) => now;
-                MidiMsg mess;
-                MIDICODES.NOTEON => mess.data1; 
-                notes[i] => mess.data2;
-                64 => mess.data3;
-                out.send( mess );
+                MidiTools.noteOn( notes[i], 64, out ); // sent
+                lengths[i % lengths.size()] => timing; // space
+                timing + humanTiming( timing ) => now; // go
+                MidiTools.noteOff( notes[i], out ); // release
             }
             timing + humanTiming( timing ) => now;
-            flush( notes, out );
+            flush( notes, out ); // just incase
         }
     }
 
@@ -186,17 +265,12 @@ public class Scene
             dur timing;
             for( int i; i < notes.size(); i++ )
             {
-                MidiMsg mess;
-                MIDICODES.NOTEON => mess.data1; 
-                notes[i] => mess.data2;
-                velocities[i % velocities.size()] => mess.data3;
-                <<< mess.data1, mess.data2, mess.data3 >>>;
-                out.send( mess );
-
-                lengths[i % lengths.size()] => timing;
+                MidiTools.noteOn( notes[i], velocities[i % velocities.size()], out );
+                lengths[i % lengths.size()] => timing; // time
                 timing + humanTiming( timing ) => now;
+                MidiTools.noteOff( notes[i], out );
             }
-            flush( notes, out );
+            flush( notes, out ); // just inacse
         }
     }
 
@@ -294,7 +368,7 @@ public class Scene
         int row[0];
         // go
         for( int i; i < numTimes; i++ )
-            row << note[ i % note.size() ];
+            row << note[i % note.size()];
         // we returned it
         return row;
     }
@@ -306,17 +380,7 @@ public class Scene
     fun void flush( int notes[], MidiOut @ out )
     {
         for( int i; i < notes.size(); i++ )
-        {
-            // most machines want note off
-            MidiMsg mess;
-            MIDICODES.NOTEOFF => mess.data1;
-            notes[i] => mess.data2;
-            0 => mess.data3;
-            out.send( mess );
-            // some machines want note on with zero velocity
-            MIDICODES.NOTEON => mess.data1;
-            out.send( mess );
-        }
+            MidiTools.noteOff( notes[i], out );
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
